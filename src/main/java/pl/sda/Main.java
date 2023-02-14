@@ -1,18 +1,19 @@
 package pl.sda;
 
+import pl.sda.dao.DepartmentDao;
+import pl.sda.model.DepartmentDto;
+
 import java.sql.*;
+import java.util.Optional;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("Hello world!");
-
-        try {
-            //Creating jdbc connection to MySql db, providing user and password.
-            //Connection and DriverManager are part of java.sql package
-            //In order to make it work we need to add mysql-connector-java dependency in the pom file
-            Connection connection = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/jdbc", "root", "Start$123"
-            );
+        //Creating jdbc connection to MySql db, providing user and password.
+        //Connection and DriverManager are part of java.sql package
+        //In order to make it work we need to add mysql-connector-java dependency in the pom file
+        try (Connection connection = DriverManager.getConnection(
+                "jdbc:mysql://127.0.0.1:3306/jdbc", "root", "Start$123")) {
 
             String dropQuery = "DROP TABLE department";
             Statement dropTableStatement = connection.createStatement();
@@ -30,26 +31,20 @@ public class Main {
                     INSERT INTO DEPARTMENT (department_id, department_name)
                     VALUES(?,?)
                     """;
-            PreparedStatement insertDepartmentStatement = connection.prepareStatement(insertDepartmentQuery);
-            insertDepartmentStatement.setInt(1, 1);
-            insertDepartmentStatement.setString(2, "Ministry of Magic");
 
-            insertDepartmentStatement.executeUpdate();
+            DepartmentDao departmentDao = new DepartmentDao(connection);
+            departmentDao.save(new DepartmentDto(1, "Ministry of Magic"));
+            departmentDao.save(new DepartmentDto(2, "Ministry of Mysteries"));
 
-            String getAllDepartmentsQuery = "SELECT * FROM department";
-            Statement getAllDepartmentsStatement = connection.createStatement();
+            System.out.println(departmentDao.getAll());
 
-            ResultSet resultSet = getAllDepartmentsStatement.executeQuery(getAllDepartmentsQuery);
-
-            while (resultSet.next()) {
-                int id = resultSet.getInt(1);
-                String name = resultSet.getString(2);
-                System.out.println("Department " + name + " with id " + id);
+            Optional<DepartmentDto> optionalDepartment = departmentDao.getById(5);
+            if (optionalDepartment.isPresent()) {
+                System.out.println(optionalDepartment.get());
             }
 
-            connection.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 }
