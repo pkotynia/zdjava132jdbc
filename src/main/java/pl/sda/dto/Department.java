@@ -1,12 +1,12 @@
-package pl.sda.model;
+package pl.sda.dto;
 
-public class DepartmentDto {
+public class Department {
 
     private int departmentId;
 
     private String departmentName;
 
-    public DepartmentDto(int departmentId, String departmentName) {
+    public Department(int departmentId, String departmentName) {
         this.departmentId = departmentId;
         this.departmentName = departmentName;
     }

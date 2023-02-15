@@ -12,7 +12,7 @@ public interface Repository<T> {
 
      Optional<T> getById(int id) throws SQLException;
 
-     T update (T t);
+     T update (T t) throws SQLException;
 
      boolean removeById(int id);
 

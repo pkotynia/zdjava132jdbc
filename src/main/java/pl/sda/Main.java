@@ -1,9 +1,12 @@
 package pl.sda;
 
 import pl.sda.dao.DepartmentDao;
-import pl.sda.model.DepartmentDto;
+import pl.sda.dao.WorkerDao;
+import pl.sda.dto.Department;
+import pl.sda.dto.Worker;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.Optional;
 
 public class Main {
@@ -15,33 +18,32 @@ public class Main {
         try (Connection connection = DriverManager.getConnection(
                 "jdbc:mysql://127.0.0.1:3306/jdbc", "root", "Start$123")) {
 
-            String dropQuery = "DROP TABLE department";
-            Statement dropTableStatement = connection.createStatement();
-            dropTableStatement.execute(dropQuery);
-
-            String createDepartmentQuery = """
-                    CREATE TABLE IF NOT EXISTS department (
-                        department_id int primary key,
-                        department_name varchar(50)
-                    );""";
-            Statement createTableStatement = connection.createStatement();
-            createTableStatement.execute(createDepartmentQuery);
-
-            String insertDepartmentQuery = """
-                    INSERT INTO DEPARTMENT (department_id, department_name)
-                    VALUES(?,?)
-                    """;
+            DataInitializer dataInitializer = new DataInitializer(connection);
+            dataInitializer.initData();
 
             DepartmentDao departmentDao = new DepartmentDao(connection);
-            departmentDao.save(new DepartmentDto(1, "Ministry of Magic"));
-            departmentDao.save(new DepartmentDto(2, "Ministry of Mysteries"));
+            departmentDao.save(new Department(1, "Ministry of Magic"));
+
+            Department ministryOfMysteries = new Department(2, "Ministry of Mysteries");
+            departmentDao.save(ministryOfMysteries);
 
             System.out.println(departmentDao.getAll());
 
-            Optional<DepartmentDto> optionalDepartment = departmentDao.getById(5);
-            if (optionalDepartment.isPresent()) {
-                System.out.println(optionalDepartment.get());
-            }
+            Optional<Department> optionalDepartment = departmentDao.getById(5);
+
+            System.out.println(optionalDepartment);
+
+            ministryOfMysteries.setDepartmentName("Ministry of Something else");
+            departmentDao.update(ministryOfMysteries);
+
+            System.out.println( departmentDao.getById(ministryOfMysteries.getDepartmentId()));
+
+            WorkerDao workerDao = new WorkerDao(connection);
+            Worker worker = new Worker(1, "Petter", "Gibbons", LocalDate.of(2022, 1, 1), 2);
+            workerDao.save(worker);
+
+            System.out.println(workerDao.getById(1));
+
 
         } catch (SQLException e) {
             e.printStackTrace();

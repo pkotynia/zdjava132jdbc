@@ -1,0 +1,53 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+interface Repository {
+    T create(T);
+    List<T> getAll();
+    Optional<T> getById(Long id);
+    T update(T);
+    boolean removeById(Long id);
+    boolean removeAll();
+}
+
+note "Repository defines set of common DB operations performed by Data Access Objects" as N3
+
+N3 .. Repository
+
+class DepartmentDao
+class WorkerDao
+class Service
+
+note "Provides final api to the end customer" as N4
+N4 .. Service
+
+Repository <|-- DepartmentDao
+Repository <|-- WorkerDao
+
+WorkerDao *-- Service
+DepartmentDao *-- Service
+
+note "These object implement DB connection." as N2
+N2 .. DepartmentDao
+N2 .. WorkerDao
+
+
+class Department {
+    int departmentId
+    String departmentName
+}
+
+class Worker {
+    int workerId
+    String firstName
+    String lastName
+    int age
+    int departmentId
+}
+
+note "Objects representing rows in DB" as N1
+
+N1 .. Department
+N1 .. Worker
+
+@enduml
