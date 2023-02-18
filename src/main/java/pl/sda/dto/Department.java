@@ -1,9 +1,12 @@
 package pl.sda.dto;
 
+// Represents Department table
 public class Department {
 
+    // represents department_id
     private int departmentId;
 
+    // represents department_name
     private String departmentName;
 
     public Department(int departmentId, String departmentName) {

@@ -4,6 +4,8 @@ import pl.sda.dao.DepartmentDao;
 import pl.sda.dao.WorkerDao;
 import pl.sda.dto.Department;
 import pl.sda.dto.Worker;
+import pl.sda.service.WorkerFullInfoService;
+import pl.sda.service.WorkerWithDepartment;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -12,15 +14,18 @@ import java.util.Optional;
 public class Main {
     public static void main(String[] args) {
         System.out.println("Hello world!");
+
         //Creating jdbc connection to MySql db, providing user and password.
         //Connection and DriverManager are part of java.sql package
         //In order to make it work we need to add mysql-connector-java dependency in the pom file
         try (Connection connection = DriverManager.getConnection(
                 "jdbc:mysql://127.0.0.1:3306/jdbc", "root", "Start$123")) {
 
+            // drop and reinitialize tables
             DataInitializer dataInitializer = new DataInitializer(connection);
             dataInitializer.initData();
 
+            //creating Dao object for CRUD operations on department table
             DepartmentDao departmentDao = new DepartmentDao(connection);
             departmentDao.save(new Department(1, "Ministry of Magic"));
 
@@ -44,6 +49,8 @@ public class Main {
 
             System.out.println(workerDao.getById(1));
 
+            WorkerFullInfoService workerFullInfoService = new WorkerFullInfoService(workerDao, departmentDao);
+            System.out.println(workerFullInfoService.presentFullWorkerDataById(1));
 
         } catch (SQLException e) {
             e.printStackTrace();

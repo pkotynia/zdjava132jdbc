@@ -14,21 +14,23 @@ public class DataInitializer {
     }
 
     public void initData() throws SQLException {
+        //todo change to Prepared statement
         String dropWorkerQuery = "DROP TABLE IF EXISTS WORKER";
         PreparedStatement dropWorkerStatement = connection.prepareStatement(dropWorkerQuery);
         dropWorkerStatement.execute();
 
         String dropQuery = "DROP TABLE IF EXISTS DEPARTMENT";
-        Statement dropTableStatement = connection.createStatement();
-        dropTableStatement.execute(dropQuery);
+        PreparedStatement dropTableStatement = connection.prepareStatement(dropQuery);
+        dropTableStatement.executeUpdate();
 
+        //todo handle affected rows
         String createDepartmentQuery = """
                     CREATE TABLE IF NOT EXISTS DEPARTMENT (
                         department_id int primary key,
                         department_name varchar(50)
                     );""";
-        Statement createTableStatement = connection.createStatement();
-        createTableStatement.execute(createDepartmentQuery);
+        PreparedStatement createTableStatement = connection.prepareStatement(createDepartmentQuery);
+        createTableStatement.executeUpdate();
 
         String createWorkerQuery = """
                 CREATE TABLE IF NOT EXISTS WORKER (
